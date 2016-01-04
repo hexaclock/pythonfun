@@ -1,0 +1,108 @@
+#Daniel Vinakovsky
+#CS-115 Homework 8 - design.txt
+#12 November 2013
+#I pledge my honor that I have abided by the Stevens Honor System
+
+"compress.py" design plan:
+
+compress.py will require a number of functions, including:
+1. A main function that will be responsible for file I/O, and calling all of the other functions below (as well as printing their output to the screen):
+	2. A function that will calculate the frequency of each character in the inputted file, and store such data in a dictionary.
+	3. A function that will actually build the Huffman tree based upon the frequency of each character (frequently occurring characters should represented with a short code, and less frequently occurring characters with longer codes)
+	4. Next, there should be a function that will build a prefix code based upon the Huffman tree.
+	5. Using the prefix code from the previous step, another function will actually encode the input string into the encoded output string.
+	6. Using Python's built-in chr() function, we can now write a function that will pack the binary output string into a string of characters.
+7. Finally, the main function will be responsible for writing the encoded string into <input_filename>.HUFFMAN.
+8. *The main function will also report the requested stats (copied from the assignment):
+    The number of different characters in the input file.
+    The total number of bytes in the input file.
+    The number of bytes required to store the code in the compressed file (this is called the "dictionary overhead").
+    The number of bytes used to store the compressed text (excluding the dictionary overhead).
+    The total length of the compressed file in bytes (this is just the sum of the previous two items).
+    The compression achieved (length of compressed file divided by length of original file).
+    The "asymptotic compression" achieved (length of compressed file except for the dictionary overhead divided by the length of the original file). This is the amount of compression that would be achieved if the file were so long that the dictionary overhead became negligible.
+
+Below, please see the pseudocode/skeleton of compress.py program:
+
+def main():
+	'''Main function that is responsible for the correct flow of the program/calling other functions'''
+	filename = raw_input("Enter name of file to be compressed: ")
+	huff2 = open(filename, "rb")
+	huffstring = huff2.read()
+	huff2.close()
+	
+	distinctChars = str(len(countFreq(huffstring)))
+	totalBytes = str(len(huffstring))
+	tree = encodingTree(countFreq(huffstring))
+	prefix = prefixCode(tree)
+	binaryoutput = encodeInput(prefix,huffstring)
+	packedprefix = packBinary(prefix)
+	packedoutput = packBinary(binaryoutput)
+	
+	print "Original file: "+filename
+	print "Distinct characters: "+distinctChars
+	print "Total bytes: "+totalBytes
+	
+	huffed = open(filename+'.HUFFMAN',"wb")
+	huffed.write(packedprefix+packedoutput)
+	huffed.close()
+	
+	print "Compressed file: ":+filename+'.HUFFMAN'
+	print "Dictionary overhead in bytes: "+str(len(prefix))
+	print "Compressed text length in bytes: "+str(len(packedoutput))
+	print "Total length in bytes: "+str(len(prefix+packedoutput))
+	print "Actual compression ratio: "+str(len(prefix+packedoutput)/(len(huffstring)))
+	print "Asymptotic compression ratio: "+str(len(packedoutput)/(len(huffstring)))
+	
+def countFreq(strg):
+	'''Given a string as an argument, this function would construct a dictionary with the frequencies of each letter.'''
+	
+def encodingTree(dict):
+	'''Given a dictionary of frequencies as outputted by countFreq, this function would build an Huffman encoding binary-style tree and return it is a list of lists'''
+	
+def prefixCode(tree):
+	'''Given a tree (list of lists), this function would return a prefix code/dictionary in the form of a binary string. This would specify the machine-readable variable-length encoding for each character.'''
+	
+def encodeInput(prefix,inputstr):
+	'''Given a prefix and an inputstr, this function would construct and output a binary, huffman-encoded string.'''
+	
+def packBinary(encstr):
+	'''This function would convert/return encstr by splitting it into 8 bit chunks, and then converting this 8 bit chunks into ASCII using chr().'''
+	
+#End compress.py functionality#
+
+
+#Begin uncompress.py functionality#
+
+"uncompress.py" design plan:
+
+1. The main function will ask the user for the name of the file to decode, and check that the filename ends in .HUFFMAN. The main function will then perform:
+	2. The text will be decoded using helper function(s).
+3. The main function will then write the decoded string to <filename>.DECODED
+*This output file should be exactly the same as the original <filename> file.
+
+Pseudocode/skeleton:
+
+def main():
+	'''Main function that is responsible for the correct flow of the program/calling other functions'''
+	filename = raw_input("Enter name of file to be UNcompressed (must end in .HUFFMAN): ")
+	if '.HUFFMAN' != filename[-8:]:
+		print "File not of the correct type"
+		main()
+	huffed = open(filename, "rb")
+	huffstring = huffed.read()
+	huffed.close()
+	
+	decodedstr = decodeHuff(huffstring)
+	
+	unhuffed = open(filename+'.DECODED',"wb")
+	unhuffed.write(decodedstr)
+	unhuffed.close()
+	
+	print "Output written to file: "+filename+'.DECODED'
+	
+def decodeHuff(encodedstr):
+	'''Given a Huffman encoded string of text prefixed with the relevant prefix code/dictionary, this function would be able to parse and decode it into a plaintext, ASCII string.'''
+
+
+#End uncompress.py functionality#
